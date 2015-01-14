@@ -4,5 +4,5 @@ import java.io.File;
 import java.util.List;
 
 public interface FrequentPairsFinder {
-	public List<SequenceItem> findFrequentPairs(List<File> textFiles, int minimalSupport);
+	public List<Sequence> findFrequentPairs(List<File> textFiles, int minimalSupport);
 }

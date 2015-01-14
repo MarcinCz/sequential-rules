@@ -8,8 +8,10 @@ public class SequenceItem {
 	public SequenceItem() {
 	}
 	
-	public SequenceItem(String element) {
-		elements.add(element);
+	public SequenceItem(String... elements) {
+		for(String element: elements) {
+			this.elements.add(element);
+		}
 	}
 	
 	public void addFirstElement(String element) {
