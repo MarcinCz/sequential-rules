@@ -49,4 +49,13 @@ public class Sequence {
 	public int hashCode() {
 		return items.hashCode();
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for(SequenceItem item: items) {
+			builder.append(item + " ");
+		}
+		return builder.toString();
+	}
 }
