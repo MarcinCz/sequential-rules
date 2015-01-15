@@ -58,42 +58,23 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 		Set<Sequence> sequencesSet = new HashSet<Sequence>();
 		for(SequenceItem sequenceItem: sequence.getSequenceItems()) {
 			for(SequenceItem visitedItem: visitedItemsWithinGap) {
-				
-				//add simple pair-sequence with all elements from items
-				Sequence pairSequence = new Sequence();
-				pairSequence.addFirstItem(visitedItem);
-				pairSequence.addLastItem(sequenceItem);
-				sequencesSet.add(pairSequence);
-				
-				//add pair-sequences with only-POS element in items for all possible combinations
-				if(visitedItem.getElements().size() == 2) {
-					Sequence pairSequenceFirstElementPOS = new Sequence();
-					SequenceItem itemPOS = new SequenceItem(visitedItem.getElements().get(1));
-					pairSequenceFirstElementPOS.addFirstItem(itemPOS);
-					pairSequenceFirstElementPOS.addLastItem(sequenceItem);
-					sequencesSet.add(pairSequenceFirstElementPOS);
-				}
-				
-				if(sequenceItem.getElements().size() == 2) {
-					Sequence pairSequenceSecondElementPOS = new Sequence();
-					SequenceItem itemPOS = new SequenceItem(sequenceItem.getElements().get(1));
-					pairSequenceSecondElementPOS.addFirstItem(visitedItem);
-					pairSequenceSecondElementPOS.addLastItem(itemPOS);
-					sequencesSet.add(pairSequenceSecondElementPOS);
-				}
-				
-				if(visitedItem.getElements().size() == 2 && sequenceItem.getElements().size() == 2) {
-					Sequence pairSequenceBothElementPOS = new Sequence();
-					SequenceItem itemPOSFirst = new SequenceItem(visitedItem.getElements().get(1));
-					SequenceItem itemPOSSecond = new SequenceItem(sequenceItem.getElements().get(1));
-					pairSequenceBothElementPOS.addFirstItem(itemPOSFirst);
-					pairSequenceBothElementPOS.addLastItem(itemPOSSecond);
-					sequencesSet.add(pairSequenceBothElementPOS);
-				}
+				sequencesSet.addAll(getAllSequenceCombinations(visitedItem, sequenceItem));
 			}
 			visitedItemsWithinGap.add(sequenceItem);
 		}
 		return sequencesSet;
+	}
+	
+	static Set<Sequence> getAllSequenceCombinations(SequenceItem itemFirst, SequenceItem itemSecond) {
+		Set<Sequence> possibleSequences = new HashSet<Sequence>();
+		for (int i = 0; i < itemFirst.getElements().size(); i++) {
+			for (int j = 0; j < itemSecond.getElements().size(); j++) {
+				SequenceItem newItemFirst = new SequenceItem(itemFirst.getElements().subList(i, itemFirst.getElements().size()).toArray(new String[0]));
+				SequenceItem newItemSecond = new SequenceItem(itemSecond.getElements().subList(j, itemSecond.getElements().size()).toArray(new String[0]));
+				possibleSequences.add(new Sequence(newItemFirst, newItemSecond));
+			}
+		}
+		return possibleSequences;
 	}
 	
 	protected void addSequenceToStorage(Sequence sequence) {
