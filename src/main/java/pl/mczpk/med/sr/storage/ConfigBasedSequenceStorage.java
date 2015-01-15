@@ -22,10 +22,17 @@ public class ConfigBasedSequenceStorage extends AbstractSequenceStorage {
 
 	private final AlgorithmConfig config;
 
-	private final Tokenizer tokenizer = new CoreNLPTokenizer();
+	private final Tokenizer tokenizer;
 
 	public ConfigBasedSequenceStorage(AlgorithmConfig config) {
 		this.config = config;
+		this.tokenizer = new CoreNLPTokenizer();
+		buildSequenceStorage();
+	}
+
+	ConfigBasedSequenceStorage(AlgorithmConfig config, Tokenizer tokenizer) {
+		this.config = config;
+		this.tokenizer = tokenizer;
 		buildSequenceStorage();
 	}
 
@@ -53,6 +60,7 @@ public class ConfigBasedSequenceStorage extends AbstractSequenceStorage {
 			if (token.isPOSAttached()) {
 				sequenceItem.addLastElement(token.getPOS());
 			}
+			sequence.addLastItem(sequenceItem);
 		}
 		addSequenceToStorage(sequence);
 	}
