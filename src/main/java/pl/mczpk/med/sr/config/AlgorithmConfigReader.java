@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class InputConfigReader {
+public class AlgorithmConfigReader {
 
 	private final static String KEY_TEXT_FILE_NAMES = "fileNames";
 	private final static String KEY_MIN_RULE_SUPPORT = "minRuleSupport";
@@ -19,7 +19,7 @@ public class InputConfigReader {
 	private final static String VALUE_LIST_SEPARATOR = ";";
 	final static String TAXONOMY_ENABLED_DEFAULT_VALUE = "false";
 
-	public static InputConfig readFromFile(String fileName) {
+	public static AlgorithmConfig readFromFile(String fileName) {
 		Properties prop = new Properties();
 		try (InputStream inputStream = new FileInputStream(fileName)) {
 			prop.load(inputStream);
@@ -33,12 +33,12 @@ public class InputConfigReader {
 		}
 	}
 
-	private static InputConfig getConfigFromProperties(Properties prop) {
+	private static AlgorithmConfig getConfigFromProperties(Properties prop) {
 		final List<File> textFiles = getTextFiles(prop);
 		final int minRuleSupport = getValueForIntKey(prop, KEY_MIN_RULE_SUPPORT);
 		final int maxGapBetweenWords = getValueForIntKey(prop, KEY_MAX_GAP_BETWEEN_WORDS);
 		final boolean isTaxonomyEnabled = getTaxonomyEnabled(prop);
-		return new InputConfig() {
+		return new AlgorithmConfig() {
 			@Override
 			public boolean isTaxonomyEnabled() {
 				return isTaxonomyEnabled;
@@ -55,7 +55,7 @@ public class InputConfigReader {
 			}
 
 			@Override
-			public int getMaxGapBetweenSequenceWords() {
+			public int getMaxGapBetweenSequenceItems() {
 				return maxGapBetweenWords;
 			}
 		};

@@ -1,6 +1,7 @@
 package pl.mczpk.med.sr.algorithm;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class Sequence {
 	private LinkedList<SequenceItem> items = new LinkedList<SequenceItem>();
@@ -20,6 +21,10 @@ public class Sequence {
 	
 	public void addLastItem(SequenceItem item)  {
 		items.addLast(item);
+	}
+	
+	public List<SequenceItem> getSequenceItems() {
+		return items;
 	}
 	
 	public void removeFirstItem() {
