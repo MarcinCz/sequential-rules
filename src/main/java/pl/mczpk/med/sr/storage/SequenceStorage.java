@@ -5,6 +5,7 @@ import java.util.Set;
 import pl.mczpk.med.sr.algorithm.Sequence;
 
 public interface SequenceStorage {
-	public boolean isSequenceFrequent(Sequence sequence);
+
+	public SequenceInfo getSequenceInfo(Sequence sequence);
 	public Set<Sequence> getFrequentPairSequences();
 }

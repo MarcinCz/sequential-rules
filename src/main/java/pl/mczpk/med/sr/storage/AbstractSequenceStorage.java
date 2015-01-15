@@ -14,23 +14,25 @@ import org.apache.log4j.Logger;
 import pl.mczpk.med.sr.algorithm.Sequence;
 import pl.mczpk.med.sr.algorithm.SequenceItem;
 
-public abstract class AbstractSequenceStorage implements SequenceStorage {
+abstract class AbstractSequenceStorage implements SequenceStorage {
 
 	private final Logger logger = Logger.getLogger(this.getClass());
 
 	private List<Sequence> sequences = new ArrayList<Sequence>();
 
 	@Override
-	public boolean isSequenceFrequent(Sequence sequence) {
-		return false;
+	public SequenceInfo getSequenceInfo(Sequence sequence) {
+		return null;
 	}
 
 	@Override
 	public Set<Sequence> getFrequentPairSequences() {
+		logger.trace("Getting frequent pair-sequences.");
 		Map<Sequence, Integer> sequenceCounterMap = new HashMap<Sequence, Integer>();
 		
+		//get all pair-sequences with their support
 		for(Sequence sequence: sequences) {
-			Set<Sequence> pairSequences = getSequencePairs(sequence);
+			Set<Sequence> pairSequences = getPairSequences(sequence);
 			for(Sequence pairSequence: pairSequences) {
 				Integer currentSeqCount = sequenceCounterMap.get(pairSequence);
 				if(currentSeqCount == null) {
@@ -40,10 +42,19 @@ public abstract class AbstractSequenceStorage implements SequenceStorage {
 				}
 			}
 		}
-		return null;
+		
+		//find and return frequent pair-sequences
+		int minSupport = getMinSequenceSupport();
+		Set<Sequence> frequentPairSequences = new HashSet<Sequence>();
+		for(Sequence sequence: sequenceCounterMap.keySet()) {
+			if(sequenceCounterMap.get(sequence) > minSupport) {
+				frequentPairSequences.add(sequence);
+			}
+		}
+		return frequentPairSequences;
 	}
 	
-	private Set<Sequence> getSequencePairs(Sequence sequence) {
+	private Set<Sequence> getPairSequences(Sequence sequence) {
 		Queue<SequenceItem> visitedItemsWithinGap = new ArrayDeque<SequenceItem>(getMaxGapBetweenSequenceItems());
 		Set<Sequence> sequencesSet = new HashSet<Sequence>();
 		for(SequenceItem sequenceItem: sequence.getSequenceItems()) {
