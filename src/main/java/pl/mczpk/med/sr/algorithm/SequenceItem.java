@@ -29,4 +29,19 @@ public class SequenceItem {
 	public void removeLastElement() {
 		elements.removeLast();
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == null || !(obj instanceof Sequence)) {
+			return false;
+		} else {
+			SequenceItem sequenceItem = (SequenceItem) obj;
+			return this.elements.equals(sequenceItem.elements);
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return elements.hashCode();
+	}
 }
