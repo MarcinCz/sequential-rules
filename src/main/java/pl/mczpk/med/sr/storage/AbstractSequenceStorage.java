@@ -13,15 +13,16 @@ import pl.mczpk.med.sr.algorithm.Sequence;
 import pl.mczpk.med.sr.algorithm.SequenceInfo;
 import pl.mczpk.med.sr.algorithm.SequenceItem;
 import pl.mczpk.med.sr.util.LimitedQueue;
+import pl.mczpk.med.sr.util.SequenceUtils;
 
 abstract class AbstractSequenceStorage implements SequenceStorage {
 
 	private final Logger logger = Logger.getLogger(this.getClass());
 
-	private List<Sequence> sequences = new ArrayList<Sequence>();
+	private List<Sequence> documentSequences = new ArrayList<Sequence>();
 
-	private List<StoredSequenceInfo> storedFrequentSequences = new ArrayList<StoredSequenceInfo>();
-	private List<Sequence> notFrequendSequences = new ArrayList<Sequence>();
+	private Map<Sequence, StoredSequenceInfo> frequentSequencesInfoMap = new HashMap<Sequence, StoredSequenceInfo>();
+	private List<Sequence> notFrequentSequences = new ArrayList<Sequence>();
 	
 	private Map<SequenceItem, List<StoredSequenceInfo>> pairsStartingWithItemMap = new HashMap<SequenceItem, List<StoredSequenceInfo>>();
 	
@@ -30,7 +31,60 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 	
 	@Override
 	public SequenceInfo getSequenceInfo(Sequence sequence) {
-		return null;
+		
+		//check in already stored frequent sequences
+		StoredSequenceInfo storedInfo = frequentSequencesInfoMap.get(sequence);
+		if(storedInfo != null) {
+			return storedInfo;
+		}
+		
+		//check for already stored not frequent sequences
+		for(Sequence notFrequentSeq: notFrequentSequences) {
+			if(sequence.equals(notFrequentSeq) || SequenceUtils.checkIfSubsequence(sequence, notFrequentSeq)) {
+				return SequenceInfo.NOT_FREQUENT_SEQUENCE;
+			}
+		}
+		
+		//check in all document sequences
+		return getSequenceInfoFromDocumentSequences(sequence, documentSequences);
+		
+	}
+
+	private SequenceInfo getSequenceInfoFromDocumentSequences(Sequence sequence, List<Sequence> documentSequences) {
+		int support = 0;
+		final List<Sequence> storingSequences = new ArrayList<Sequence>();
+		for(Sequence documentSequence: documentSequences) {
+			if(SequenceUtils.checkIfSubsequenceWithMaxGap(documentSequence, sequence, getMaxGapBetweenSequenceItems())) {
+				support += 1;
+				storingSequences.add(documentSequence);
+			}
+		}
+		
+		final int finalSupport = support;
+		if(support > getMinSequenceSupport()) {
+			StoredSequenceInfo info = new StoredSequenceInfo() {
+				
+				@Override
+				public boolean isFrequent() {
+					return true;
+				}
+				
+				@Override
+				public int getSupport() {
+					return finalSupport;
+				}
+
+				@Override
+				public List<Sequence> getStoringSequnces() {
+					return storingSequences;
+				}
+			};
+			frequentSequencesInfoMap.put(sequence, info);
+			return info;
+		} else {
+			notFrequentSequences.add(sequence);
+			return SequenceInfo.NOT_FREQUENT_SEQUENCE;
+		}
 	}
 
 	@Override
@@ -39,7 +93,7 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 		Map<Sequence, Integer> sequenceCounterMap = new HashMap<Sequence, Integer>();
 		
 		//get all pair-sequences with their support
-		for(Sequence sequence: sequences) {
+		for(Sequence sequence: documentSequences) {
 			Set<Sequence> pairSequences = getPairSequences(sequence);
 			for(Sequence pairSequence: pairSequences) {
 				Integer currentSeqCount = sequenceCounterMap.get(pairSequence);
@@ -93,7 +147,7 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 	}
 	
 	protected void addSequenceToStorage(Sequence sequence) {
-		sequences.add(sequence);
+		documentSequences.add(sequence);
 	}
 	
 	protected abstract int getMaxGapBetweenSequenceItems();
