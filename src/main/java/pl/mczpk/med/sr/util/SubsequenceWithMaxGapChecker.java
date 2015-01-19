@@ -1,7 +1,5 @@
 package pl.mczpk.med.sr.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +26,12 @@ class SubsequenceWithMaxGapChecker {
 			SequenceItem item = sequence.getSequenceItemAt(i);
 
 			if (subseqeunce.getSequenceItems().contains(item)) {
-				List<Integer> positions = subsequenceItemsPositionsInSequence.get(item);
-				if (positions == null) {
-					subsequenceItemsPositionsInSequence.put(item, new ArrayList<Integer>(Arrays.asList(i)));
-				} else {
-					positions.add(i);
-				}
+				MapUtils.putNewValueToListMap(subsequenceItemsPositionsInSequence, item, i);
 			}
 		}
-		
-		for(int sequencePosition : subsequenceItemsPositionsInSequence.get(subseqeunce.getSequenceItemAt(0))) {
-			if(checkNextSubsequenceItem(1, sequencePosition)) {
+
+		for (int sequencePosition : subsequenceItemsPositionsInSequence.get(subseqeunce.getSequenceItemAt(0))) {
+			if (checkNextSubsequenceItem(1, sequencePosition)) {
 				return true;
 			}
 		}
@@ -46,13 +39,13 @@ class SubsequenceWithMaxGapChecker {
 	}
 
 	private boolean checkNextSubsequenceItem(int currentSubsequencePosition, int currentSequencePosition) {
-		if(currentSubsequencePosition >= subseqeunce.getSequenceItems().size()) {
+		if (currentSubsequencePosition >= subseqeunce.getSequenceItems().size()) {
 			return true;
 		}
-		
+
 		for (int nextPossiblePosition : subsequenceItemsPositionsInSequence.get(subseqeunce.getSequenceItemAt(currentSubsequencePosition))) {
 			if (nextPossiblePosition > currentSequencePosition && nextPossiblePosition <= currentSequencePosition + maxGap + 1)
-				if(checkNextSubsequenceItem(++currentSubsequencePosition, nextPossiblePosition)) {
+				if (checkNextSubsequenceItem(++currentSubsequencePosition, nextPossiblePosition)) {
 					return true;
 				}
 		}

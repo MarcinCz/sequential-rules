@@ -12,7 +12,9 @@ import org.apache.log4j.Logger;
 import pl.mczpk.med.sr.algorithm.Sequence;
 import pl.mczpk.med.sr.algorithm.SequenceInfo;
 import pl.mczpk.med.sr.algorithm.SequenceItem;
+import pl.mczpk.med.sr.storage.StoredSequenceInfo.StoredSequenceInfoImpl;
 import pl.mczpk.med.sr.util.LimitedQueue;
+import pl.mczpk.med.sr.util.MapUtils;
 import pl.mczpk.med.sr.util.SequenceUtils;
 
 abstract class AbstractSequenceStorage implements SequenceStorage {
@@ -22,11 +24,11 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 	private List<Sequence> documentSequences = new ArrayList<Sequence>();
 
 	private Map<Sequence, StoredSequenceInfo> frequentSequencesInfoMap = new HashMap<Sequence, StoredSequenceInfo>();
-	private List<Sequence> notFrequentSequences = new ArrayList<Sequence>();
+	private Set<Sequence> notFrequentSequences = new HashSet<Sequence>();
 	
-	private Map<SequenceItem, List<StoredSequenceInfo>> pairsStartingWithItemMap = new HashMap<SequenceItem, List<StoredSequenceInfo>>();
+	private Map<SequenceItem, List<Sequence>> pairsStartingWithItemMap = new HashMap<SequenceItem, List<Sequence>>();
 	
-	private Map<SequenceItem, List<StoredSequenceInfo>> pairsEndingWithItemMap = new HashMap<SequenceItem, List<StoredSequenceInfo>>();
+	private Map<SequenceItem, List<Sequence>> pairsEndingWithItemMap = new HashMap<SequenceItem, List<Sequence>>();
 	
 	
 	@Override
@@ -62,23 +64,7 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 		
 		final int finalSupport = support;
 		if(support > getMinSequenceSupport()) {
-			StoredSequenceInfo info = new StoredSequenceInfo() {
-				
-				@Override
-				public boolean isFrequent() {
-					return true;
-				}
-				
-				@Override
-				public int getSupport() {
-					return finalSupport;
-				}
-
-				@Override
-				public List<Sequence> getStoringSequnces() {
-					return storingSequences;
-				}
-			};
+			StoredSequenceInfo info = new StoredSequenceInfoImpl(finalSupport, true, documentSequences);
 			frequentSequencesInfoMap.put(sequence, info);
 			return info;
 		} else {
@@ -91,11 +77,13 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 	public Set<Sequence> getFrequentPairSequences() {
 		logger.trace("Getting frequent pair-sequences.");
 		Map<Sequence, Integer> sequenceCounterMap = new HashMap<Sequence, Integer>();
+		Map<Sequence, List<Sequence>> sequenceDocumentsMap= new HashMap<Sequence, List<Sequence>>();
 		
 		//get all pair-sequences with their support
-		for(Sequence sequence: documentSequences) {
-			Set<Sequence> pairSequences = getPairSequences(sequence);
+		for(Sequence documentSequence: documentSequences) {
+			Set<Sequence> pairSequences = getPairSequences(documentSequence);
 			for(Sequence pairSequence: pairSequences) {
+				MapUtils.putNewValueToListMap(sequenceDocumentsMap, pairSequence, documentSequence);
 				Integer currentSeqCount = sequenceCounterMap.get(pairSequence);
 				if(currentSeqCount == null) {
 					sequenceCounterMap.put(pairSequence, 1);
@@ -108,9 +96,16 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 		//find and return frequent pair-sequences
 		int minSupport = getMinSequenceSupport();
 		Set<Sequence> frequentPairSequences = new HashSet<Sequence>();
-		for(Sequence sequence: sequenceCounterMap.keySet()) {
-			if(sequenceCounterMap.get(sequence) > minSupport) {
-				frequentPairSequences.add(sequence);
+		for(Sequence pairSequence: sequenceCounterMap.keySet()) {
+			int pairSupport = sequenceCounterMap.get(pairSequence);
+			if(pairSupport > minSupport) {
+				frequentPairSequences.add(pairSequence);
+				
+				//store found pairs in storage structures
+				StoredSequenceInfo info = new StoredSequenceInfoImpl(pairSupport, true, sequenceDocumentsMap.get(pairSequence));
+				MapUtils.putNewValueToListMap(pairsStartingWithItemMap, pairSequence.getFirstSequenceItem(), pairSequence);
+				MapUtils.putNewValueToListMap(pairsEndingWithItemMap, pairSequence.getLastSequenceItem(), pairSequence);
+				frequentSequencesInfoMap.put(pairSequence, info);
 			}
 		}
 		return frequentPairSequences;
@@ -142,8 +137,68 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 	
 	
 	@Override
-	public Sequence expand(Sequence sequece) {
-		return null;
+	public Sequence expand(Sequence sequence) {
+		return expandSequence(sequence);
+	}
+	
+	private Sequence expandSequence(Sequence sequence) {
+		for(int i = 0; i <= sequence.getSequenceItems().size(); i++) {
+			
+			if(i == 0) {
+				if(pairsEndingWithItemMap.get(sequence.getFirstSequenceItem()) == null) {
+					continue;
+				}
+				//adding item at front
+				for(Sequence pairSequence: pairsEndingWithItemMap.get(sequence.getFirstSequenceItem())) {
+					Sequence expanedSequence = new Sequence(sequence);
+					expanedSequence.addFirstItem(pairSequence.getFirstSequenceItem());
+					if(getSequenceInfoFromDocumentSequences(expanedSequence, frequentSequencesInfoMap.get(pairSequence).getStoringSequnces()).isFrequent()) {
+						return expandSequence(expanedSequence);
+					}
+				}
+			} else if(i == sequence.getSequenceItems().size()) {
+				if(pairsStartingWithItemMap.get(sequence.getLastSequenceItem()) == null) {
+					continue;
+				}
+				//adding item at tail
+				for(Sequence pairSequence: pairsStartingWithItemMap.get(sequence.getLastSequenceItem())) {
+					Sequence expanedSequence = new Sequence(sequence);
+					expanedSequence.addLastItem(pairSequence.getLastSequenceItem());
+					if(getSequenceInfoFromDocumentSequences(expanedSequence, frequentSequencesInfoMap.get(pairSequence).getStoringSequnces()).isFrequent()) {
+						return expandSequence(expanedSequence);
+					}
+				}
+			} else {
+				if(pairsStartingWithItemMap.get(sequence.getSequenceItemAt(i - 1)) == null || pairsEndingWithItemMap.get(sequence.getSequenceItemAt(i)) == null) {
+					continue;
+				}
+				//adding item in the middle
+				for(Sequence pairSequenceFirst: pairsStartingWithItemMap.get(sequence.getSequenceItemAt(i - 1))) {
+					for(Sequence pairSequenceSecond: pairsEndingWithItemMap.get(sequence.getSequenceItemAt(i))) {
+						//check if pairs can be connected
+						if(!pairSequenceFirst.getLastSequenceItem().equals(pairSequenceSecond.getFirstSequenceItem())) {
+							continue;
+						}
+						//get common storing documents for pairs
+						List<Sequence> firstPairSequences = frequentSequencesInfoMap.get(pairSequenceFirst).getStoringSequnces();
+						List<Sequence> secondPairSequences = frequentSequencesInfoMap.get(pairSequenceSecond).getStoringSequnces();
+						List<Sequence> commonDocumentSequences = new ArrayList<Sequence>(firstPairSequences);
+						commonDocumentSequences.retainAll(secondPairSequences);
+						if(commonDocumentSequences.size() == 0) {
+							continue;
+						}
+						
+						//expand for pairs
+						Sequence expanedSequence = new Sequence(sequence);
+						expanedSequence.addItemAtIndex(i, pairSequenceFirst.getLastSequenceItem());
+						if (getSequenceInfoFromDocumentSequences(expanedSequence, commonDocumentSequences).isFrequent()) {
+							return expandSequence(expanedSequence);
+						}
+					}
+				}
+			}
+		}
+		return sequence;
 	}
 	
 	protected void addSequenceToStorage(Sequence sequence) {

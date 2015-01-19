@@ -13,5 +13,5 @@ public interface SequenceStorage {
 	 * Returns frequent sentence with one item added to given sequence. 
 	 * If there is no longer frequent sentence (given sequence is maximal) then the same sequence is returned. 
 	 */
-	public Sequence expand(Sequence sequece);
+	public Sequence expand(Sequence sequence);
 }

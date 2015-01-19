@@ -1,12 +1,16 @@
 package pl.mczpk.med.sr.algorithm;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Sequence {
-	private LinkedList<SequenceItem> items = new LinkedList<SequenceItem>();
+public class Sequence{
+	private List<SequenceItem> items = new ArrayList<SequenceItem>();
 	
 	public Sequence() {
+	}
+	
+	public Sequence(Sequence sequence) {
+		this.items = new ArrayList<SequenceItem>(sequence.items);
 	}
 	
 	public Sequence(SequenceItem... items) {
@@ -15,12 +19,25 @@ public class Sequence {
 		}
 	}
 	
+	public void addItemAtIndex(int index, SequenceItem item) {
+		items.add(index, item);
+	}
+	
 	public void addFirstItem(SequenceItem item) {
-		items.addFirst(item);
+		items.add(0, item);
 	}
 	
 	public void addLastItem(SequenceItem item)  {
-		items.addLast(item);
+		items.add(item);
+	}
+	
+	
+	public SequenceItem getFirstSequenceItem() {
+		return items.get(0);
+	}
+	
+	public SequenceItem getLastSequenceItem() {
+		return items.get(items.size() - 1);
 	}
 	
 	public List<SequenceItem> getSequenceItems() {
@@ -32,11 +49,11 @@ public class Sequence {
 	}
 	 
 	public void removeFirstItem() {
-		items.removeFirst();
+		items.remove(0);
 	}
 	
 	public void removeLastItem() {
-		items.removeLast();
+		items.remove(items.size() - 1);
 	}
 	
 	@Override
