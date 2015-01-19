@@ -27,6 +27,10 @@ public class Sequence {
 		return items;
 	}
 	
+	public SequenceItem getSequenceItemAt(int index) {
+		return items.get(index);
+	}
+	 
 	public void removeFirstItem() {
 		items.removeFirst();
 	}

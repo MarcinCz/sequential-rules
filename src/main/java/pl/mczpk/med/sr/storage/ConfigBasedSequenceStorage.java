@@ -74,4 +74,5 @@ public class ConfigBasedSequenceStorage extends AbstractSequenceStorage {
 	protected int getMinSequenceSupport() {
 		return config.getMinRuleSupport();
 	}
+
 }

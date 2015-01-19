@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import pl.mczpk.med.sr.algorithm.Sequence;
+import pl.mczpk.med.sr.algorithm.SequenceInfo;
 import pl.mczpk.med.sr.algorithm.SequenceItem;
 import pl.mczpk.med.sr.util.LimitedQueue;
 
@@ -19,6 +20,14 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 
 	private List<Sequence> sequences = new ArrayList<Sequence>();
 
+	private List<StoredSequenceInfo> storedFrequentSequences = new ArrayList<StoredSequenceInfo>();
+	private List<Sequence> notFrequendSequences = new ArrayList<Sequence>();
+	
+	private Map<SequenceItem, List<StoredSequenceInfo>> pairsStartingWithItemMap = new HashMap<SequenceItem, List<StoredSequenceInfo>>();
+	
+	private Map<SequenceItem, List<StoredSequenceInfo>> pairsEndingWithItemMap = new HashMap<SequenceItem, List<StoredSequenceInfo>>();
+	
+	
 	@Override
 	public SequenceInfo getSequenceInfo(Sequence sequence) {
 		return null;
@@ -75,6 +84,12 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 			}
 		}
 		return possibleSequences;
+	}
+	
+	
+	@Override
+	public Sequence expand(Sequence sequece) {
+		return null;
 	}
 	
 	protected void addSequenceToStorage(Sequence sequence) {

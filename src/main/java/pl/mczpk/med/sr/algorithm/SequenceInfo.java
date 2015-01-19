@@ -1,4 +1,4 @@
-package pl.mczpk.med.sr.storage;
+package pl.mczpk.med.sr.algorithm;
 
 public interface SequenceInfo {
 	public boolean isFrequent();
