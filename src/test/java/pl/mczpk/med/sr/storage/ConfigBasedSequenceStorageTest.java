@@ -63,6 +63,44 @@ public class ConfigBasedSequenceStorageTest {
 	}
 	
 	@Test
+	public void shouldReturnSequenceInfoForFrequentSequencesWithGivenStoredSubsequences() {
+		when(config.getMinRuleSupport()).thenReturn(1);
+		ConfigBasedSequenceStorage storage = new ConfigBasedSequenceStorage(config, SequenceStorageTestTokenizerMocks.getTwoFilesTokenizer(false));
+		storage.getFrequentPairSequences();
+		SequenceItem itemA = new SequenceItem("a");
+		SequenceItem itemB = new SequenceItem("b");
+		SequenceItem itemD = new SequenceItem("d");
+		
+		//put breakpoint on line where we return info for all documents, because info for subsequences are not present
+		//debugger should not stop on that breakpoint
+		SequenceInfo info = storage.getSequenceInfo(new Sequence(itemA, itemA, itemB), Arrays.asList(new Sequence(itemA, itemA), new Sequence(itemA, itemB)));
+		assertEquals(true, info.isFrequent());
+		assertEquals(2, info.getSupport());
+		
+		info = storage.getSequenceInfo(new Sequence(itemA, itemB, itemD), Arrays.asList(new Sequence(itemA, itemB), new Sequence(itemB, itemD)));
+		assertEquals(true, info.isFrequent());
+		assertEquals(3, info.getSupport());
+
+		info = storage.getSequenceInfo(new Sequence(itemA, itemA, itemB, itemD), Arrays.asList(new Sequence(itemA, itemB, itemD), new Sequence(itemA, itemA, itemB)));
+		assertEquals(true, info.isFrequent());
+		assertEquals(2, info.getSupport());
+	}
+	
+	@Test
+	public void shouldReturnSequenceInfoForFrequentSequencesWithGivenNotStoredSubsequences() {
+		when(config.getMinRuleSupport()).thenReturn(1);
+		ConfigBasedSequenceStorage storage = new ConfigBasedSequenceStorage(config, SequenceStorageTestTokenizerMocks.getTwoFilesTokenizer(false));
+		SequenceItem itemA = new SequenceItem("a");
+		SequenceItem itemB = new SequenceItem("b");
+		
+		//put breakpoint on line where we return info for all documents, because info for subsequences are not present
+		//debugger should stop on that breakpoint
+		SequenceInfo info = storage.getSequenceInfo(new Sequence(itemA, itemA, itemB), Arrays.asList(new Sequence(itemA, itemA), new Sequence(itemA, itemB)));
+		assertEquals(true, info.isFrequent());
+		assertEquals(2, info.getSupport());
+	}
+	
+	@Test
 	public void shouldReturnSequenceInfoForNotFrequentSequences() {
 		ConfigBasedSequenceStorage storage = new ConfigBasedSequenceStorage(config, SequenceStorageTestTokenizerMocks.getTwoFilesTokenizer(false));
 		SequenceItem itemA = new SequenceItem("a");

@@ -51,6 +51,27 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 		return getSequenceInfoFromDocumentSequences(sequence, documentSequences);
 		
 	}
+	
+	@Override
+	public SequenceInfo getSequenceInfo(Sequence sequence, List<Sequence> subsequences) {
+		List<Sequence> commonDocumentSequences = null;
+		for(int i = 0; i < subsequences.size(); i++) {
+			StoredSequenceInfo storedSubseqeunceInfo = frequentSequencesInfoMap.get(subsequences.get(i));
+			
+			if(storedSubseqeunceInfo == null) {
+				logger.warn("Checking all documents. No info stored for subsequence " + subsequences.get(i));
+				return getSequenceInfoFromDocumentSequences(sequence, documentSequences);
+			}
+			
+			if(i == 0) {
+				commonDocumentSequences = new ArrayList<Sequence>(storedSubseqeunceInfo.getStoringSequnces());
+			} else {
+				commonDocumentSequences.retainAll(storedSubseqeunceInfo.getStoringSequnces());
+			}
+		}
+		
+		return getSequenceInfoFromDocumentSequences(sequence, commonDocumentSequences);
+	}
 
 	private SequenceInfo getSequenceInfoFromDocumentSequences(Sequence sequence, List<Sequence> documentSequences) {
 		int support = 0;

@@ -11,6 +11,13 @@ import pl.mczpk.med.sr.tokenizer.Tokenizer.Token;
 
 public class SequenceStorageTestTokenizerMocks {
 
+	public static Tokenizer getOneFileTokenizer(boolean attachPOS) {
+		Tokenizer tokenizer = mock(Tokenizer.class);
+		List<Token> tokensFirst = getTokensFirstExample(attachPOS);
+		when(tokenizer.tokenize(anyString(), anyBoolean())).thenReturn(tokensFirst);
+		return tokenizer;
+	}
+	
 	public static Tokenizer getTwoFilesTokenizer(boolean attachPOS) {
 		Tokenizer tokenizer = mock(Tokenizer.class);
 		List<Token> tokensFirst = getTokensFirstExample(attachPOS);
