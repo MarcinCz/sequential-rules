@@ -1,6 +1,7 @@
 package pl.mczpk.med.sr.storage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,23 +33,7 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 
 	@Override
 	public SequenceInfo getSequenceInfo(Sequence sequence) {
-
-		//check in already stored frequent sequences
-		StoredSequenceInfo storedInfo = frequentSequencesInfoMap.get(sequence);
-		if (storedInfo != null) {
-			return storedInfo;
-		}
-
-		//check for already stored not frequent sequences
-		for (Sequence notFrequentSeq : notFrequentSequences) {
-			if (sequence.equals(notFrequentSeq) || SequenceUtils.checkIfSubsequence(sequence, notFrequentSeq)) {
-				return SequenceInfo.NOT_FREQUENT_SEQUENCE;
-			}
-		}
-
-		//check in all document sequences
-		return getSequenceInfoFromDocumentSequences(sequence, documentSequences);
-
+		return getSequenceInfo(sequence, Collections.<Sequence>emptyList());
 	}
 
 	@Override
@@ -64,6 +49,10 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 			if (sequence.equals(notFrequentSeq) || SequenceUtils.checkIfSubsequence(sequence, notFrequentSeq)) {
 				return SequenceInfo.NOT_FREQUENT_SEQUENCE;
 			}
+		}
+		
+		if(subsequences == null || subsequences.size() == 0) {
+			return getSequenceInfoFromDocumentSequences(sequence, documentSequences);
 		}
 				
 		List<Sequence> commonDocumentSequences = null;
