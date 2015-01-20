@@ -30,6 +30,11 @@ class SubsequenceWithMaxGapChecker {
 			}
 		}
 
+		if (subsequenceItemsPositionsInSequence.get(subseqeunce.getSequenceItemAt(0)) == null) {
+			//first item from subsequence was not found in sequence
+			return false;
+		}
+
 		for (int sequencePosition : subsequenceItemsPositionsInSequence.get(subseqeunce.getSequenceItemAt(0))) {
 			if (checkNextSubsequenceItem(1, sequencePosition)) {
 				return true;
@@ -43,12 +48,18 @@ class SubsequenceWithMaxGapChecker {
 			return true;
 		}
 
-		for (int nextPossiblePosition : subsequenceItemsPositionsInSequence.get(subseqeunce.getSequenceItemAt(currentSubsequencePosition))) {
+		List<Integer> subseqeunceItemPositions = subsequenceItemsPositionsInSequence.get(subseqeunce.getSequenceItemAt(currentSubsequencePosition));
+		if (subseqeunceItemPositions == null) {
+			//one of the items from subsequence was not found in sequence
+			return false;
+		}
+		for (int nextPossiblePosition : subseqeunceItemPositions) {
 			if (nextPossiblePosition > currentSequencePosition && nextPossiblePosition <= currentSequencePosition + maxGap + 1)
 				if (checkNextSubsequenceItem(++currentSubsequencePosition, nextPossiblePosition)) {
 					return true;
 				}
 		}
+
 		return false;
 	}
 

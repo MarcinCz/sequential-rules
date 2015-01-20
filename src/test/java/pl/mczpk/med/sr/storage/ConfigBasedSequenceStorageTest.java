@@ -125,14 +125,24 @@ public class ConfigBasedSequenceStorageTest {
 		Sequence expanded = storage.expand(new Sequence(itemA, itemB));
 		assertEquals(new Sequence(itemA, itemB, itemC), expanded);
 		
-		expanded = storage.expand(new Sequence(itemA, itemC));
-		assertEquals(new Sequence(itemA, itemB, itemC), expanded);
-		
 		expanded = storage.expand(new Sequence(itemB, itemC));
 		assertEquals(new Sequence(itemA, itemB, itemC), expanded);
 		
 		expanded = storage.expand(new Sequence(itemA, itemB, itemC));
 		assertEquals(new Sequence(itemA, itemB, itemC), expanded);
+	}
+	
+	@Test (expected = IllegalStateException.class)
+	public void shouldFailIfExpandNotCheckedSequence() {
+		ConfigBasedSequenceStorage storage = new ConfigBasedSequenceStorage(config, SequenceStorageTestTokenizerMocks.getTwoFilesTokenizer(false));
+		storage.getFrequentPairSequences();
+		SequenceItem itemA = new SequenceItem("a");
+		SequenceItem itemB = new SequenceItem("b");
+		SequenceItem itemC = new SequenceItem("c");
+		
+		Sequence expanded = storage.expand(new Sequence(itemA, itemC));
+		assertEquals(new Sequence(itemA, itemB, itemC), expanded);
+
 	}
 	
 	private void printSequences(Set<Sequence> sequences) {
