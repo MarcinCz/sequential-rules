@@ -53,6 +53,19 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 
 	@Override
 	public SequenceInfo getSequenceInfo(Sequence sequence, List<Sequence> subsequences) {
+		//check in already stored frequent sequences
+		StoredSequenceInfo storedInfo = frequentSequencesInfoMap.get(sequence);
+		if (storedInfo != null) {
+			return storedInfo;
+		}
+
+		//check for already stored not frequent sequences
+		for (Sequence notFrequentSeq : notFrequentSequences) {
+			if (sequence.equals(notFrequentSeq) || SequenceUtils.checkIfSubsequence(sequence, notFrequentSeq)) {
+				return SequenceInfo.NOT_FREQUENT_SEQUENCE;
+			}
+		}
+				
 		List<Sequence> commonDocumentSequences = null;
 		for (int i = 0; i < subsequences.size(); i++) {
 			StoredSequenceInfo storedSubseqeunceInfo = frequentSequencesInfoMap.get(subsequences.get(i));
