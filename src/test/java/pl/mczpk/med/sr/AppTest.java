@@ -24,16 +24,17 @@ public class AppTest {
 
 	private final Logger logger = Logger.getLogger(this.getClass());
 	
+	@Ignore
 	@Test
 	public void test() {
 		List<File> textFiles = new ArrayList<File>();
 		textFiles.addAll(getFilesFromFolder("D:/downloads/20_newsgroups.tar/20_newsgroups/20_newsgroups/temp"));
 
 		AlgorithmConfig config = mock(AlgorithmConfig.class);
-		when(config.getMaxGapBetweenSequenceItems()).thenReturn(3);
+		when(config.getMaxGapBetweenSequenceItems()).thenReturn(2);
 		when(config.getMinRuleSupport()).thenReturn(8);
 		when(config.getTextFiles()).thenReturn(textFiles);
-		when(config.isTaxonomyEnabled()).thenReturn(true);
+//		when(config.isTaxonomyEnabled()).thenReturn(true);
 
 		FrequentWordSequenceFinder sequenceFinder = new FrequentWordSequenceFinder();
 		ConfigBasedSequenceStorage storage = new ConfigBasedSequenceStorage(config);
