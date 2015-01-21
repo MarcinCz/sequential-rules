@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,8 +35,12 @@ public class AppRunner {
 		};
 		
 		Set<Sequence> sequences = storage.getFrequentPairSequences();
-		System.out.println(String.format("Found %s maximal frequent sequences.", sequences.size()));
-		String fileName = saveSequencesToFile(new ArrayList<Sequence>(sequences));
+		Set<Sequence> expaned = new HashSet<Sequence>();
+		for(Sequence seq: sequences) {
+			expaned.add(storage.expand(seq));
+		}
+		System.out.println(String.format("Found %s maximal frequent sequences.", expaned.size()));
+		String fileName = saveSequencesToFile(configFileName, new ArrayList<Sequence>(expaned));
 		System.out.println(String.format("Sequences saved in file '%s'.", fileName));
 	}
 	
@@ -44,8 +49,8 @@ public class AppRunner {
 	 * @param sequences
 	 * @return
 	 */
-	private String saveSequencesToFile(List<Sequence> sequences) {
-		String fileName = "sequences-" + new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss-SSS").format(new Date());
+	private String saveSequencesToFile(String configName, List<Sequence> sequences) {
+		String fileName = "configName-" + new SimpleDateFormat("yyyyMMddhhmmssSSS").format(new Date()) + ".seq";
 		
 		try {
 			Writer writer = new FileWriter(fileName);

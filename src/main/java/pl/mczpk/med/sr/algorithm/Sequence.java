@@ -13,6 +13,10 @@ public class Sequence{
 		this.items = new ArrayList<SequenceItem>(sequence.items);
 	}
 	
+	public Sequence(List<SequenceItem> sequenceItems) {
+		this.items = sequenceItems;
+	}
+	
 	public Sequence(SequenceItem... items) {
 		for(SequenceItem item: items) {
 			this.items.add(item);
