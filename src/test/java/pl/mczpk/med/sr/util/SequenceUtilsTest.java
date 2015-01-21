@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import pl.mczpk.med.sr.algorithm.FrequentWordSequenceFinder;
 import pl.mczpk.med.sr.algorithm.Sequence;
 import pl.mczpk.med.sr.algorithm.SequenceItem;
 
@@ -83,4 +84,6 @@ public class SequenceUtilsTest {
 		assertEquals(1, sequences.size());
 		assertTrue(sequences.contains(new Sequence(item1, item1, item1)));
 	}
+	
+	
 }
