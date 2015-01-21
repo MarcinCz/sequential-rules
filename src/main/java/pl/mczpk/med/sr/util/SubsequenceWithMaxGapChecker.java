@@ -7,7 +7,7 @@ import java.util.Map;
 import pl.mczpk.med.sr.algorithm.Sequence;
 import pl.mczpk.med.sr.algorithm.SequenceItem;
 
-class SubsequenceWithMaxGapChecker {
+public class SubsequenceWithMaxGapChecker {
 	private Sequence sequence;
 	private Sequence subseqeunce;
 	private int maxGap;
@@ -41,6 +41,30 @@ class SubsequenceWithMaxGapChecker {
 			}
 		}
 		return false;
+	}
+	
+	public int startingIndex() {
+		subsequenceItemsPositionsInSequence = new HashMap<SequenceItem, List<Integer>>();
+
+		for (int i = 0; i < sequence.getSequenceItems().size(); i++) {
+			SequenceItem item = sequence.getSequenceItemAt(i);
+
+			if (subseqeunce.getSequenceItems().contains(item)) {
+				MapUtils.putNewValueToListMap(subsequenceItemsPositionsInSequence, item, i);
+			}
+		}
+
+		if (subsequenceItemsPositionsInSequence.get(subseqeunce.getSequenceItemAt(0)) == null) {
+			//first item from subsequence was not found in sequence
+			return -1;
+		}
+
+		for (int sequencePosition : subsequenceItemsPositionsInSequence.get(subseqeunce.getSequenceItemAt(0))) {
+			if (checkNextSubsequenceItem(1, sequencePosition)) {
+				return sequencePosition;
+			}
+		}
+		return -1;
 	}
 
 	private boolean checkNextSubsequenceItem(int currentSubsequencePosition, int currentSequencePosition) {
