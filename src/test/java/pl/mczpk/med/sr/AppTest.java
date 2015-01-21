@@ -24,7 +24,6 @@ public class AppTest {
 
 	private final Logger logger = Logger.getLogger(this.getClass());
 	
-	@Ignore
 	@Test
 	public void test() {
 		List<File> textFiles = new ArrayList<File>();
