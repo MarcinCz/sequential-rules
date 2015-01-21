@@ -1,10 +1,10 @@
 package pl.mczpk.med.sr.algorithm;
 
-import java.util.Set;
+import java.util.List;
 
 import pl.mczpk.med.sr.storage.SequenceStorage;
 
 public interface MaximalFrequentSequenceFinder {
 
-	public Set<Sequence> findMaximalFrequentSequence(SequenceStorage storage);
+	public List<Sequence> findMaximalFrequentSequence(SequenceStorage storage);
 }
