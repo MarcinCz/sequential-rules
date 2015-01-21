@@ -19,12 +19,11 @@ import pl.mczpk.med.sr.algorithm.Sequence;
 import pl.mczpk.med.sr.config.AlgorithmConfig;
 import pl.mczpk.med.sr.storage.ConfigBasedSequenceStorage;
 
-//@Ignore("test dla duzego zbioru - dlugo trwa")
+@Ignore("test dla duzego zbioru - dlugo trwa")
 public class AppTest {
 
 	private final Logger logger = Logger.getLogger(this.getClass());
 	
-	@Ignore
 	@Test
 	public void test() {
 		List<File> textFiles = new ArrayList<File>();
