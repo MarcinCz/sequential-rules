@@ -10,6 +10,7 @@ public class App
     {
     	if(args.length == 0) {
     		System.out.println("You need to give config file name as parameter.");
+    		return;
     	}
         String configFileName = args[0];
         try {
