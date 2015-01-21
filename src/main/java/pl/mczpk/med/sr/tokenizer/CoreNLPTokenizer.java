@@ -28,7 +28,9 @@ public class CoreNLPTokenizer implements Tokenizer {
 
 		List<Token> tokens = new ArrayList<CoreNLPTokenizer.Token>(); 
 		for (CoreLabel label : labels) {
-			tokens.add(getToken(label, attachPOS));
+			if(!label.get(ValueAnnotation.class).matches("\\p{Punct}+?")) {
+				tokens.add(getToken(label, attachPOS));
+			}
 		}
 		
 		return tokens;
