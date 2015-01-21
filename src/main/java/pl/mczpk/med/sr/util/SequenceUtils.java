@@ -33,9 +33,9 @@ public class SequenceUtils {
 	public static Set<Sequence> join(Sequence s1, Sequence s2) {
 		Set<Sequence> sequences = new HashSet<Sequence>();
 		Set<Sequence> joinOneDirection = joinOneDirection(s1, s2);
-		sequences.addAll(joinOneDirection);
+		if(joinOneDirection != null) sequences.addAll(joinOneDirection);
 		Set<Sequence> joinOneDirection2 = joinOneDirection(s2, s1);
-		sequences.addAll(joinOneDirection2);
+		if(joinOneDirection2 != null) sequences.addAll(joinOneDirection2);
 		return sequences;
 	}
 	
