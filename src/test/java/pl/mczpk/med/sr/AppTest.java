@@ -19,7 +19,7 @@ import pl.mczpk.med.sr.algorithm.Sequence;
 import pl.mczpk.med.sr.config.AlgorithmConfig;
 import pl.mczpk.med.sr.storage.ConfigBasedSequenceStorage;
 
-//@Ignore("test dla duzego zbioru - dlugo trwa")
+@Ignore("test dla duzego zbioru - dlugo trwa i trzeba lokalna sciezke podac")
 public class AppTest {
 
 	private final Logger logger = Logger.getLogger(this.getClass());
@@ -52,12 +52,6 @@ public class AppTest {
 			   logger.info("Support: " + storage.getSequenceInfo(seq, null).getSupport() + ", sequence: " + seq);
 			  }
 		logger.info(sequenceList.size() + " sequences has been found in " + crTime + " ms");
-//		logger.info("The longest sequence found is ( " + maxSeq + ") and its length is " + max);
-//		Set<Sequence> pairs = storage.getFrequentPairSequences();
-//		Iterator<Sequence> iterator = pairs.iterator();
-//		iterator.next();
-//		Sequence expanded = storage.expand(iterator.next());
-//		System.out.println(expanded);
 	}
 	
 	private List<File> getFilesFromFolder(String folderName) {
