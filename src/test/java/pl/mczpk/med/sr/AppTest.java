@@ -27,20 +27,31 @@ public class AppTest {
 	@Test
 	public void test() {
 		List<File> textFiles = new ArrayList<File>();
-		textFiles.addAll(getFilesFromFolder("D:/downloads/20_newsgroups.tar/20_newsgroups/20_newsgroups/alt.atheism"));
+		textFiles.addAll(getFilesFromFolder("D:/downloads/20_newsgroups.tar/20_newsgroups/20_newsgroups/temp"));
 
 		AlgorithmConfig config = mock(AlgorithmConfig.class);
-		when(config.getMaxGapBetweenSequenceItems()).thenReturn(2);
-		when(config.getMinRuleSupport()).thenReturn(5);
+		when(config.getMaxGapBetweenSequenceItems()).thenReturn(3);
+		when(config.getMinRuleSupport()).thenReturn(8);
 		when(config.getTextFiles()).thenReturn(textFiles);
+		when(config.isTaxonomyEnabled()).thenReturn(true);
 
 		FrequentWordSequenceFinder sequenceFinder = new FrequentWordSequenceFinder();
 		ConfigBasedSequenceStorage storage = new ConfigBasedSequenceStorage(config);
+		long startTime = System.currentTimeMillis();
 		List<Sequence> sequenceList = sequenceFinder.findMaximalFrequentSequence(storage);
+		long crTime = System.currentTimeMillis() - startTime;
 		
-		for(Sequence seq : sequenceList)
-			logger.info(seq);
-		
+		int max = 0;
+		Sequence maxSeq = null;
+		for(Sequence seq : sequenceList) {
+				if (seq.getSequenceItems().size() > max){
+					maxSeq = seq;
+					max = maxSeq.getSequenceItems().size();
+				}
+			   logger.info("Support: " + storage.getSequenceInfo(seq, null).getSupport() + ", sequence: " + seq);
+			  }
+		logger.info(sequenceList.size() + " sequences has been found in " + crTime + " ms");
+//		logger.info("The longest sequence found is ( " + maxSeq + ") and its length is " + max);
 //		Set<Sequence> pairs = storage.getFrequentPairSequences();
 //		Iterator<Sequence> iterator = pairs.iterator();
 //		iterator.next();

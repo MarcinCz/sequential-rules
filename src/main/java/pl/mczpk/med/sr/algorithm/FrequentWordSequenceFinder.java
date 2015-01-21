@@ -64,85 +64,85 @@ public class FrequentWordSequenceFinder implements MaximalFrequentSequenceFinder
 	/**
 	 * @param sequences
 	 */
-//	private void prune(Set<Gram> grams){
-//		Set<Sequence> marked = new HashSet<Sequence>();
-//		for (Sequence g : sequences){
-//			Set<Sequence> LMax = new HashSet<Sequence>();
-//			Set<Sequence> RMax = new HashSet<Sequence>();
-//			Set<Sequence> LStr = new HashSet<Sequence>();
-//			Set<Sequence> RStr = new HashSet<Sequence>();
-//			Set<Sequence> LStr_P = new HashSet<Sequence>();
-//			Set<Sequence> RStr_P = new HashSet<Sequence>();
-//			
-//			for (Sequence max : maximalFrequentSequences){
-//				Sequence gTmp = new Sequence(g);
-//				gTmp.removeLastItem();
-//				if (SequenceUtils.checkIfSubsequence(max, gTmp))
-//					LMax.add(max);
-//			}
-//			for (Sequence max : maximalFrequentSequences){
-//				Sequence gTmp = new Sequence(g);
-//				gTmp.removeFirstItem();
-//				if (SequenceUtils.checkIfSubsequence(max, gTmp))
-//					RMax.add(max);
-//			}
-//			for (Sequence max : LMax){
-//				Sequence maxTmp = new Sequence(max);
-//				Sequence gTmp = new Sequence(g);
-//				
-//				gTmp.removeLastItem();
-//				
-//				SubsequenceWithMaxGapChecker checker = new SubsequenceWithMaxGapChecker(maxTmp, gTmp, 0);
-//				int i = checker.startingIndex();
-//				
-//				if(i>0){
-//					for(int j = i; j<maxTmp.getSequenceItems().size(); ++j){
-//						maxTmp.removeLastItem();
-//					}
-//					LStr_P.add(maxTmp);
-//				}
-//				
-//			}
-//			
-//			for (Sequence max : RMax){
-//				Sequence maxTmp = new Sequence(max);
-//				Sequence gTmp = new Sequence(g);
-//				
-//				gTmp.removeFirstItem();;
-//				
-//				SubsequenceWithMaxGapChecker checker = new SubsequenceWithMaxGapChecker(maxTmp, gTmp, 0);
-//				int i = checker.startingIndex();
-//				
-//				if(i>0){
-//					for(int j = i + gTmp.getSequenceItems().size(); j>0; --j){
-//						maxTmp.removeFirstItem();
-//					}
-//					RStr_P.add(maxTmp);
-//				}
-//			}
-//			
-////			krok 8, 9
-//			
-//			
-//			for(Sequence s1 : LStr){
-//				for(Sequence s2 : RStr){
-//					Sequence sNew = new Sequence(g);
-//					addAtBegin(s1, sNew);
-//					addAtEnd(sNew, s2);
-//					if (!isSubsequenceOfMax(sNew)){
-////						for(Sequence subsequence : sNew){
-////							if(!isSubsequenceOfMax(subsequence))
-////								
-////								
-////						}
-//					}
-//				}
-//			}
-//		}
-//		
-//		grams.removeAll(marked);
-//	}
-//	
+	private void prune(Set<Gram> grams){
+		Set<Gram> marked = new HashSet<Gram>();
+		for (Gram g : grams){
+			Sequence seq = g.getSequence();  
+			Set<Sequence> LMax = new HashSet<Sequence>();
+			Set<Sequence> RMax = new HashSet<Sequence>();
+			Set<Sequence> LStr = new HashSet<Sequence>();
+			Set<Sequence> RStr = new HashSet<Sequence>();
+			Set<Sequence> LStr_P = new HashSet<Sequence>();
+			Set<Sequence> RStr_P = new HashSet<Sequence>();
+			
+			for (Sequence max : maximalFrequentSequences){
+				Sequence gTmp = new Sequence(seq);
+				gTmp.removeLastItem();
+				if (SequenceUtils.checkIfSubsequence(max, gTmp))
+					LMax.add(max);
+			}
+			for (Sequence max : maximalFrequentSequences){
+				Sequence gTmp = new Sequence(seq);
+				gTmp.removeFirstItem();
+				if (SequenceUtils.checkIfSubsequence(max, gTmp))
+					RMax.add(max);
+			}
+			for (Sequence max : LMax){
+				Sequence maxTmp = new Sequence(max);
+				Sequence gTmp = new Sequence(seq);
+				
+				gTmp.removeLastItem();
+				
+				SubsequenceWithMaxGapChecker checker = new SubsequenceWithMaxGapChecker(maxTmp, gTmp, 0);
+				int i = checker.startingIndex();
+				
+				if(i>0){
+					for(int j = i; j<maxTmp.getSequenceItems().size(); ++j){
+						maxTmp.removeLastItem();
+					}
+					LStr_P.add(maxTmp);
+				}
+				
+			}
+			
+			for (Sequence max : RMax){
+				Sequence maxTmp = new Sequence(max);
+				Sequence gTmp = new Sequence(seq);
+				
+				gTmp.removeFirstItem();;
+				
+				SubsequenceWithMaxGapChecker checker = new SubsequenceWithMaxGapChecker(maxTmp, gTmp, 0);
+				int i = checker.startingIndex();
+				
+				if(i>0){
+					for(int j = i + gTmp.getSequenceItems().size(); j>0; --j){
+						maxTmp.removeFirstItem();
+					}
+					RStr_P.add(maxTmp);
+				}
+			}
+			
+//			krok 8, 9
+			
+			
+			for(Sequence s1 : LStr){
+				for(Sequence s2 : RStr){
+					Sequence sNew = new Sequence(seq);
+					addAtBegin(s1, sNew);
+					addAtEnd(sNew, s2);
+					if (!isSubsequenceOfMax(g)){
+						for(Sequence subsequence : g.getSubsequences()){
+							if(!isSubsequenceOfMax(createGram(g.getSequence(), null)))
+								marked.add(g);
+						}
+					}
+				}
+			}
+		}
+		
+		grams.removeAll(marked);
+	}
+	
 	static Gram createGram(final Sequence sequence, final List<Sequence> sequencesList){
 		return new Gram(){
 
