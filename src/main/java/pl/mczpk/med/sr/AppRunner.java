@@ -5,15 +5,11 @@ import java.io.IOException;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import pl.mczpk.med.sr.algorithm.MaximalFrequentSequenceFinder;
+import pl.mczpk.med.sr.algorithm.FrequentWordSequenceFinder;
 import pl.mczpk.med.sr.algorithm.Sequence;
-import pl.mczpk.med.sr.algorithm.SequenceItem;
 import pl.mczpk.med.sr.config.AlgorithmConfig;
 import pl.mczpk.med.sr.config.AlgorithmConfigReader;
 import pl.mczpk.med.sr.storage.ConfigBasedSequenceStorage;
@@ -21,26 +17,15 @@ import pl.mczpk.med.sr.storage.SequenceStorage;
 
 public class AppRunner {
 
-	private MaximalFrequentSequenceFinder finder;
 
 	public void run(String configFileName) {
 		AlgorithmConfig config = AlgorithmConfigReader.readFromFile(configFileName);
 		SequenceStorage storage = new ConfigBasedSequenceStorage(config);
-        finder = new MaximalFrequentSequenceFinder() {
-			
-			@Override
-			public List<Sequence> findMaximalFrequentSequence(SequenceStorage storage) {
-				return Arrays.asList(new Sequence(new SequenceItem("a"), new SequenceItem("b")), new Sequence(new SequenceItem("c"), new SequenceItem("d")));
-			}
-		};
+		FrequentWordSequenceFinder finder = new FrequentWordSequenceFinder();
 		
-		Set<Sequence> sequences = storage.getFrequentPairSequences();
-		Set<Sequence> expaned = new HashSet<Sequence>();
-		for(Sequence seq: sequences) {
-			expaned.add(storage.expand(seq));
-		}
-		System.out.println(String.format("Found %s maximal frequent sequences.", expaned.size()));
-		String fileName = saveSequencesToFile(configFileName, new ArrayList<Sequence>(expaned));
+		List<Sequence> sequences = finder.findMaximalFrequentSequence(storage);
+		System.out.println(String.format("Found %s maximal frequent sequences.", sequences.size()));
+		String fileName = saveSequencesToFile(configFileName, new ArrayList<Sequence>(sequences));
 		System.out.println(String.format("Sequences saved in file '%s'.", fileName));
 	}
 	

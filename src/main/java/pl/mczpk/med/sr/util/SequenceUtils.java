@@ -2,7 +2,6 @@ package pl.mczpk.med.sr.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import pl.mczpk.med.sr.algorithm.Sequence;

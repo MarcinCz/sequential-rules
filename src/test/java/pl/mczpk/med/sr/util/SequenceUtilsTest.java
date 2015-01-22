@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import pl.mczpk.med.sr.algorithm.FrequentWordSequenceFinder;
 import pl.mczpk.med.sr.algorithm.Sequence;
 import pl.mczpk.med.sr.algorithm.SequenceItem;
 

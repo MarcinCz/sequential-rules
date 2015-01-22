@@ -64,6 +64,7 @@ public class FrequentWordSequenceFinder implements MaximalFrequentSequenceFinder
 	/**
 	 * @param sequences
 	 */
+	@SuppressWarnings("unused")
 	private void prune(Set<Gram> grams){
 		Set<Gram> marked = new HashSet<Gram>();
 		for (Gram g : grams){
@@ -180,13 +181,14 @@ public class FrequentWordSequenceFinder implements MaximalFrequentSequenceFinder
 					Set<Sequence> subsequencesList = new HashSet<Sequence>();
 					subsequencesList.addAll(grams.get(i).getSubsequences());
 					subsequencesList.addAll(grams.get(j).getSubsequences());
-					newSequencesList.add(createGram(seq, new ArrayList(subsequencesList)));
+					newSequencesList.add(createGram(seq, new ArrayList<Sequence>(subsequencesList)));
 				}
 			}
 		}
 		return newSequencesList;
 	}
 
+	@SuppressWarnings("unused")
 	private Set<Gram> joinSequences(Gram g1, Gram g2){
 		List<SequenceItem> s1 = g1.getSequence().getSequenceItems();
 		List<SequenceItem> s2 = g2.getSequence().getSequenceItems();
