@@ -163,7 +163,8 @@ abstract class AbstractSequenceStorage implements SequenceStorage {
 	@Override
 	public Sequence expand(Sequence sequence) {
 		Sequence expandedSequence = expandSequence(sequence);
-		logger.debug(String.format("Sequence %s expanded to %s", sequence, expandedSequence));
+		SequenceInfo info = getSequenceInfo(expandedSequence);
+		logger.debug(String.format("Sequence %s expanded to %s (sup: %s)", sequence, expandedSequence, info.getSupport()));
 		return expandedSequence;
 	}
 
